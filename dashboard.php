@@ -147,31 +147,6 @@ if (!isset($_SESSION['username'])) {
             </p>
         </div>
 
-        <div class="info-box">
-
-            <div class="card">
-                <h3>📦 Data Kiriman</h3>
-                <p>
-                    Kelola semua data pengiriman barang dengan mudah dan cepat.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>📊 Data Stok</h3>
-                <p>
-                    Pantau stok barang gudang secara realtime.
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>🔒 Keamanan</h3>
-                <p>
-                    Sistem login membantu menjaga keamanan data gudang.
-                </p>
-            </div>
-
-        </div>
-
     </div>
 
 </body>
