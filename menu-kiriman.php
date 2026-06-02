@@ -12,13 +12,28 @@ $dataBarang = $pdo->query("
     SELECT * FROM barang
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// Ambil data kiriman
-$dataKiriman = $pdo->query("
-    SELECT k.*, b.nama_barang 
-    FROM kiriman k
-    JOIN barang b ON k.id_barang = b.id_barang
-    ORDER BY k.id_kiriman DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+// --- LOGIKA PENCARIAN (HANYA BERSIFAT MENYARING DATA JIKA ADA GET SEARCH) ---
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+if (!empty($search)) {
+    $stmt = $pdo->prepare("
+        SELECT k.*, b.nama_barang 
+        FROM kiriman k
+        JOIN barang b ON k.id_barang = b.id_barang
+        WHERE b.nama_barang LIKE ? OR k.tujuan LIKE ?
+        ORDER BY k.id_kiriman DESC
+    ");
+    $stmt->execute(["%$search%", "%$search%"]);
+    $dataKiriman = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Ambil data kiriman (CODE ASLI ANDA TETAP DI SINI)
+    $dataKiriman = $pdo->query("
+        SELECT k.*, b.nama_barang 
+        FROM kiriman k
+        JOIN barang b ON k.id_barang = b.id_barang
+        ORDER BY k.id_kiriman DESC
+    ")->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?>
 
@@ -174,6 +189,48 @@ $dataKiriman = $pdo->query("
             color:#64748b;
         }
 
+        /* --- STYLES BARU UNTUK FORM SEARCH --- */
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            max-width: 450px;
+        }
+        .search-wrapper input {
+            margin-bottom: 0;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+        .search-wrapper .btn-search {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .search-wrapper .btn-search:hover {
+            background: #1d4ed8;
+        }
+        .search-wrapper .btn-reset {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .search-wrapper .btn-reset:hover {
+            background: #cbd5e1;
+        }
+
     </style>
 
 </head>
@@ -248,6 +305,20 @@ $dataKiriman = $pdo->query("
     <div class="card">
 
         <h2>📋 Riwayat Daftar Pengiriman</h2>
+
+        <!-- --- FORM SEARCH (HANYA INI YANG DISISIPKAN DI ATAS TABEL) --- -->
+        <form action="" method="GET" class="search-wrapper">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Cari nama barang atau kota tujuan..." 
+                value="<?= htmlspecialchars($search) ?>"
+            >
+            <button type="submit" class="btn-search">Cari</button>
+            <?php if (!empty($search)): ?>
+                <a href="menu-kiriman.php" class="btn-reset">Reset</a>
+            <?php endif; ?>
+        </form>
 
         <table>
 
